@@ -1,0 +1,53 @@
+<div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+  <!-- Buscador -->
+  <input
+    type="text"
+    placeholder="Buscar tarea..."
+    [formControl]="search"
+    class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  />
+
+  <!-- Lista de tareas filtradas -->
+  <ul *ngIf="tareasFiltradas | async as tareasFiltradas" class="space-y-2 mb-6">
+    <li
+      *ngFor="let tarea of tareasFiltradas; let i = index"
+      class="flex justify-between items-center p-3 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition"
+    >
+      <span>{{ tarea }}</span>
+      <button
+        (click)="borrarTarea(i)"
+        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+      >
+        Eliminar
+      </button>
+    </li>
+
+    <li
+      *ngIf="tareasFiltradas.length === 0"
+      class="text-red-500 text-center py-3"
+    >
+      No se encontraron tareas que coincidan con la búsqueda.
+    </li>
+  </ul>
+
+  <!-- Formulario para agregar tareas -->
+  <form
+    [formGroup]="formAgregar"
+    (ngSubmit)="agregarTarea()"
+    class="flex gap-2"
+  >
+    <input
+      type="text"
+      placeholder="Nueva tarea"
+      formControlName="nuevaTarea"
+      class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+    />
+    <button
+      type="submit"
+      [disabled]="formAgregar.invalid"
+      class="px-4 py-3 bg-blue-500 text-white rounded-lg disabled:bg-blue-300 hover:bg-blue-600 transition"
+    >
+      Agregar
+    </button>
+  </form>
+</div>

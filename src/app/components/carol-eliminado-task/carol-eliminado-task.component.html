@@ -1,0 +1,79 @@
+<div class="flex flex-col h-screen items-center p-10 bg-yellow-200">
+  <!-- Botón de volver alineado a la izquierda -->
+  <button
+    routerLink="/"
+    class="self-start ml-4 bg-purple-400 text-white px-4 py-2 border border-dashed border-red-500 rounded-md hover:bg-purple-500 hover:scale-105 transition-transform"
+  >
+    ← Back
+  </button>
+
+  <!-- Caja principal -->
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg mt-6">
+    <!-- Título -->
+    <h2
+      class="bg-sky-100 text-lg text-gray-700 font-bold px-6 py-3 rounded-md shadow-sm text-center"
+    >
+      Task List
+    </h2>
+
+    <!-- Formulario con validación -->
+    <form
+      [formGroup]="taskForm"
+      (ngSubmit)="addTask()"
+      class="flex items-center gap-3 mt-4"
+    >
+      <input
+        formControlName="title"
+        type="text"
+        placeholder="Write here..."
+        class="w-full p-3 border border-blue-400 text-gray-700 rounded-md outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
+      />
+
+      <button
+        type="submit"
+        [disabled]="taskForm.invalid"
+        class="bg-orange-500 text-white text-sm px-4 py-2 border border-black rounded-md hover:bg-orange-600 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Add
+      </button>
+    </form>
+
+    <!-- Mostrar error si el input no cumple la validación -->
+    <p
+      *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+      class="text-red-500 text-xs mt-2"
+    >
+      The task must be at least 3 characters long.
+    </p>
+
+    <!-- Lista de tareas -->
+    <ul *ngIf="tasks.length > 0; else noTasks" class="mt-6 w-full space-y-3">
+      <li
+        *ngFor="let task of tasks"
+        class="flex justify-between items-center p-4 bg-gray-50 border-l-4 border-green-500 rounded-md shadow-sm"
+      >
+        <span
+          [class.line-through]="task.completed"
+          (click)="toggleTask(task)"
+          class="text-base font-medium text-gray-800 cursor-pointer hover:text-green-600 transition"
+        >
+          {{ task.title }}
+        </span>
+
+        <button
+          (click)="deleteTask(task.id)"
+          class="bg-red-500 text-white border border-black px-3 py-1 rounded-md hover:bg-red-600 hover:scale-105 transition-transform"
+        >
+          ❌
+        </button>
+      </li>
+    </ul>
+
+    <!-- Estado de "No hay tareas" -->
+    <ng-template #noTasks>
+      <p class="text-gray-600 text-center text-sm mt-6">
+        No tasks available. Add one above!
+      </p>
+    </ng-template>
+  </div>
+</div>

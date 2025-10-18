@@ -1,27 +1,27 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
-  ReactiveFormsModule,
   Validators,
+  ReactiveFormsModule,
 } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import {
   debounceTime,
   distinctUntilChanged,
   map,
-  Observable,
   startWith,
+  Observable,
 } from 'rxjs';
 
 @Component({
   selector: 'app-task2',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './task2.component.html',
   styleUrl: './task2.component.css',
 })
-export class Task2Component {
-  // Lista inicial de tareas
+export class Task2Component implements OnInit {
   tareas: string[] = [
     'Estudiar Node Js',
     'Sacar al perro',
@@ -30,15 +30,16 @@ export class Task2Component {
     'Escribir el testamento urgente',
   ];
 
-  // FormControl para el buscador
   search = new FormControl('');
 
-  // Formulario para añadir tareas nuevas
   formAgregar = new FormGroup({
-    nuevaTarea: new FormControl('', Validators.required),
+    nuevaTarea: new FormControl('', [
+      Validators.required, // Campo obligatorio
+      Validators.minLength(3), // Mínimo 3 caracteres
+      Validators.pattern(/\S+/), // No solo espacios en blanco
+    ]),
   });
 
-  // Observable de tareas filtradas
   tareasFiltradas: Observable<string[]> = this.search.valueChanges.pipe(
     startWith(''),
     debounceTime(300),
@@ -46,24 +47,42 @@ export class Task2Component {
     map((texto) => this.filtrarTareas(texto || ''))
   );
 
-  // Filtra tareas con trim() y sin distinguir mayúsc/minúsc
+  ngOnInit(): void {
+    // ✅ Simular lista grande de tareas
+    // for (let i = 0; i < 1000; i++) {
+    //   this.tareas.push(`Tarea simulada ${i}`);
+    // }
+  }
+
   filtrarTareas(texto: string): string[] {
     const termino = texto.trim().toLowerCase();
     if (!termino) return this.tareas;
-    return this.tareas.filter((t) => t.toLowerCase().includes(termino));
+    return this.tareas.filter((t) => t.toLowerCase().trim().includes(termino));
   }
 
-  // Añadir tarea nueva
   agregarTarea() {
     const tarea = this.formAgregar.value.nuevaTarea?.trim();
-    if (tarea) {
+    if (!tarea) return;
+
+    const tareaNormalizada = tarea.toLowerCase();
+    const existe = this.tareas.some(
+      (t) => t.toLowerCase().trim() === tareaNormalizada
+    );
+
+    if (!existe) {
       this.tareas.push(tarea);
       this.formAgregar.reset();
+    } else {
+      alert('¡Esta tarea ya existe!');
     }
   }
 
-  // Borrar tarea individual
   borrarTarea(index: number) {
     this.tareas.splice(index, 1);
+  }
+
+  // ✅ Función trackBy para mejorar rendimiento en listas grandes
+  trackByFn(index: number, item: string): string {
+    return item;
   }
 }
